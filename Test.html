@@ -17,8 +17,12 @@
         <input type="button" onclick="getprofile()" value="Get Profile/s" />
         <div id="profiles"></div>
         
-        <button id="profilebutton" type="button"></button>
-      </form>
+        <button id="profilebutton" type="button" onclick="console.log(profilebutton)"></button>
+        <div class="container">
+          <div id="btns"></div>
+          <div id="gifs"></div>
+        </div>
+      </form> 
       <div id="messages"></div>
     </div>
   </body>
@@ -39,7 +43,7 @@
       .then(data => {
         console.log(data.player.stats.SkyBlock);
         for (i in data.player.stats.SkyBlock.profiles) {
-          profileCutename += data.player.stats.SkyBlock.profiles[i].cute_name;
+          // profileCutename += data.player.stats.SkyBlock.profiles[i].cute_name;
           profilearray.push(data.player.stats.SkyBlock.profiles[i].cute_name);
         }
         document.getElementById("profiles").innerHTML = profileCutename;
@@ -49,7 +53,7 @@
   }
   function profileButtons() {
     var profilebutton = document.getElementById("profilebutton");
-    profilebutton.removeChild(profilebutton.childNodes[0]); 
+    profilebutton.innerHTML = "";
     for (var i = 0; i < profilearray.length; i++) {
       var butt = document.createElement("button");
       butt.innerHTML = profilearray[i];
