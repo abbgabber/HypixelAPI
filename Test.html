@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Page Title</title>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <h1>Stats finder</h1>
+      <form id="connection-information-form">
+        <b>Name:</b>
+        <input id="name" type="text" name="name" value="Stranght" /><br />
+        <!-- <b>Port:</b>
+            <input id="port" type="text" name="port" value="1884" /><br />
+            <b>Topic:</b>
+            <input id="topic" type="text" name="topic" value="#" /><br /><br /> -->
+        <input type="button" onclick="getprofile()" value="Get Profile/s" />
+        <div id="profiles"></div>
+        
+        <button id="profilebutton" type="button"></button>
+      </form>
+      <div id="messages"></div>
+    </div>
+  </body>
+</html>
+
+<script>
+  function getprofile() {
+    (profileCutename = ""),
+      (profilearray = []),
+      (name = document.getElementById("name").value);
+    fetch(
+      "https://api.hypixel.net/player?key=80bd3173-ca33-420c-ada0-193561c153ec&name=" +
+        name
+    )
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        console.log(data.player.stats.SkyBlock);
+        for (i in data.player.stats.SkyBlock.profiles) {
+          profileCutename += data.player.stats.SkyBlock.profiles[i].cute_name;
+          profilearray.push(data.player.stats.SkyBlock.profiles[i].cute_name);
+        }
+        document.getElementById("profiles").innerHTML = profileCutename;
+        profileButtons();
+      })
+      .catch(err => {});
+  }
+  function profileButtons() {
+    var profilebutton = document.getElementById("profilebutton");
+    profilebutton.removeChild(profilebutton.childNodes[0]); 
+    for (var i = 0; i < profilearray.length; i++) {
+      var butt = document.createElement("button");
+      butt.innerHTML = profilearray[i];
+      profilebutton.appendChild(butt);
+    }
+  }
+</script>
