@@ -1,63 +1,291 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Page Title</title>
+    <title>Hypixel Stats Finder 2.0</title>
+    <script
+      src="https://kit.fontawesome.com/6ed1fedfeb.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://pbs.twimg.com/profile_images/1082701131510370304/PkO4h8Cn_400x400.jpg"
+      rel="icon"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:500&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
     <div class="wrapper">
-      <h1>Stats finder</h1>
-      <form id="connection-information-form">
-        <b>Name:</b>
-        <input id="name" type="text" name="name" value="Stranght" /><br />
-        <!-- <b>Port:</b>
-            <input id="port" type="text" name="port" value="1884" /><br />
-            <b>Topic:</b>
-            <input id="topic" type="text" name="topic" value="#" /><br /><br /> -->
-        <input type="button" onclick="getprofile()" value="Get Profile/s" />
-        <div id="profiles"></div>
-        
-        <button id="profilebutton" type="button" onclick="console.log(profilebutton)"></button>
-        <div class="container">
-          <div id="btns"></div>
-          <div id="gifs"></div>
-        </div>
-      </form> 
+      <input
+        id="name"
+        type="text"
+        value="Stranght"
+        placeholder="Username"
+        class="search-bar"
+      />
+      <a>
+        <i onclick="getstats(1)" id="search-button" class="fas fa-search"></i>
+      </a>
+      <div id="profiles"></div>
+      <div style="position:relative; left:700px; top:-100px;">
+        <p id="rank"></p>
+        <select id="profilebutton" onChange="getstats()"></select>
+        <div id="playersinprofile"></div>
+        <div id="playermodel"></div>
+        <div id="armor"></div>
+        <img src="assets/ImperiaL_/revenant_boots.png"
+      </div>
       <div id="messages"></div>
     </div>
   </body>
 </html>
 
 <script>
-  function getprofile() {
-    (profileCutename = ""),
-      (profilearray = []),
-      (name = document.getElementById("name").value);
+  //Performs getstats when pressing enter in the name input
+  document.getElementById("name").onkeydown = function(event) {
+    if (event.keyCode == 13) {
+      getstats(1);
+    }
+  };
+
+  function getstats(makebuttons) {
+    name = document.getElementById("name").value;
+    yourprofiles = [];
+    playerprofiles = [];
+    let profiles = {};
+    value = makebuttons;
+    let loading = true;
     fetch(
-      "https://api.hypixel.net/player?key=80bd3173-ca33-420c-ada0-193561c153ec&name=" +
+      "https://api.hypixel.net/player?key=d4eaf4e7-23aa-4196-9440-fe9af430f614&name=" +
         name
     )
       .then(response => {
         return response.json();
       })
       .then(data => {
-        console.log(data.player.stats.SkyBlock);
-        for (i in data.player.stats.SkyBlock.profiles) {
-          // profileCutename += data.player.stats.SkyBlock.profiles[i].cute_name;
-          profilearray.push(data.player.stats.SkyBlock.profiles[i].cute_name);
+        if (data.player !== null) {
+          let src = document.getElementById("playermodel");
+          let playersinprofile = document.getElementById("playersinprofile");
+          playersinprofile.innerHTML = "";
+          src.innerHTML = "";
+          // console.log(value)
+
+          playeruuid = data.player.uuid;
+          let img = document.createElement("img");
+          img.src = "https://crafatar.com/renders/body/" + playeruuid;
+          src.appendChild(img);
+
+          // Checks the rank of the player and displays it on the page
+          if (data.player.hasOwnProperty("rank")) {
+            document.getElementById("rank").innerHTML =
+              "Rank: " + data.player.rank;
+          } else if (data.player.hasOwnProperty("monthlyPackageRank")) {
+            document.getElementById("rank").innerHTML = "Rank: MVP++";
+          } else if (data.player.hasOwnProperty("newPackageRank")) {
+            if (data.player.newPackageRank == "VIP_PLUS") {
+              document.getElementById("rank").innerHTML = "Rank: VIP+";
+            } else if (data.player.newPackageRank == "MVP_PLUS") {
+              document.getElementById("rank").innerHTML = "Rank: MVP+";
+            } else {
+              document.getElementById("rank").innerHTML =
+                "Rank: " + data.player.newPackageRank;
+            }
+          } else if (data.player.hasOwnProperty("PackageRank")) {
+            if (data.player.PackageRank == "VIP_PLUS") {
+              document.getElementById("rank").innerHTML = "Rank: VIP+";
+            } else if (data.player.PackageRank == "MVP_PLUS") {
+              document.getElementById("rank").innerHTML = "Rank: MVP+";
+            } else {
+              document.getElementById("rank").innerHTML =
+                "Rank: " + data.player.PackageRank;
+            }
+          } else {
+            document.getElementById("rank").innerHTML = "Default";
+          }
+
+          if (data.player.stats.SkyBlock.hasOwnProperty("profiles")) {
+            for (i in data.player.stats.SkyBlock.profiles) {
+              profileid = data.player.stats.SkyBlock.profiles[i].profile_id;
+              cuteNames = data.player.stats.SkyBlock.profiles[i].cute_name;
+              pfruit = cuteNames;
+              yourprofiles.push(
+                data.player.stats.SkyBlock.profiles[i].cute_name
+              );
+              if (value == 1) {
+                profileButtons();
+              }
+              findProfileMembers(profileid, cuteNames);
+              getPlayerItems(profileid, cuteNames);
+            }
+          }
+        } else {
+          document.getElementById("playermodel").innerHTML = "";
         }
-        document.getElementById("profiles").innerHTML = profileCutename;
-        profileButtons();
+        loading = false;
+      });
+  }
+
+  function findProfileMembers(profileid, cuteNames) {
+    let ProfileName = cuteNames;
+    let profilevalue = document.getElementById("profilebutton");
+    profilevalue.style.display = "block";
+
+    fetch(
+      "https://api.slothpixel.me/api/skyblock/profile/" +
+        name +
+        "/" +
+        ProfileName
+    )
+      .then(response => {
+        return response.json();
       })
-      .catch(err => {});
+      .then(data => {
+        // console.log(data.members);
+        for (i in data.members) {
+          profilemembers = data.members[i].player.username;
+          if (name.toLowerCase() !== profilemembers.toLowerCase()) {
+            if (ProfileName == profilevalue.value) {
+              let pprof = document.createElement("p");
+              pprof.innerHTML = profilemembers;
+              playersinprofile.appendChild(pprof);
+            }
+          }
+        }
+      });
+  }
+  function getPlayerItems(profileid, cuteNames) {
+    let ProfileName = cuteNames;
+    let profilevalue = document.getElementById("profilebutton");
+    let armour = document.getElementById("armor");
+    // let boots = [];
+    // let legg = [];
+    // let chest = [];
+    // let helm = [];
+    armour.innerHTML = "  ";
+    fetch(
+      "https://api.slothpixel.me/api/skyblock/profile/" +
+        name +
+        "/" +
+        ProfileName
+    )
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        for (i in data.members) {
+          profilemembers = data.members[i].player.username;
+          // console.log(profilemembers);
+          if (name.toLowerCase() == profilemembers.toLowerCase()) {
+            if (ProfileName == profilevalue.value) {
+              armor = data.members[i].armor;
+              console.log(armor);
+              // console.log(boots);
+
+              for (x in armor) {
+                if (armor[x].name !== undefined) {
+                  let pprof = document.createElement("p");
+                  pprof.innerHTML = armor[x].name.substring(2);
+                  armour.appendChild(pprof);
+                }
+              }
+              if (data.members[i].inventory[0] !== undefined) {
+                weapon = data.members[i].inventory[0].name;
+                let pprof = document.createElement("p");
+                pprof.innerHTML = weapon.substring(2);
+                armour.appendChild(pprof);
+              }
+            }
+          }
+        }
+      });
   }
   function profileButtons() {
-    var profilebutton = document.getElementById("profilebutton");
-    profilebutton.innerHTML = "";
-    for (var i = 0; i < profilearray.length; i++) {
-      var butt = document.createElement("button");
-      butt.innerHTML = profilearray[i];
-      profilebutton.appendChild(butt);
+    let profilebutton = document.getElementById("profilebutton");
+    profilebutton.innerHTML = "Your Profiles";
+    for (let i = 0; i < yourprofiles.length; i++) {
+      let option = document.createElement("OPTION");
+      option.innerHTML = yourprofiles[i];
+      // option.innerHTML = "<span style='color: red;'>" + yourprofiles[i] + "</span>";
+      profilebutton.appendChild(option);
+    }
+  }
+  function doesFileExist(urlToFile) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("HEAD", urlToFile, false);
+    xhr.send();
+
+    if (xhr.status == "404") {
+      return false;
+    } else {
+      return true;
     }
   }
 </script>
+
+<style>
+  #rank {
+    font-size: 30px;
+    text-decoration-color: white;
+  }
+
+  #profilebutton {
+    font-size: 30px;
+    text-decoration-color: white;
+  }
+
+  body {
+    font-family: "Roboto", sans-serif;
+  }
+
+  #playersinprofile {
+    font-size: 30px;
+  }
+
+  .wrapper {
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 960px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  input[type="text"] {
+    font-family: "Roboto", sans-serif;
+    font-size: 20px;
+  }
+
+  input[type="button"] {
+    font-family: "Roboto", sans-serif;
+    font-size: 15px;
+  }
+
+  select {
+    font-family: "Roboto", sans-serif;
+    padding: 0px 20px;
+    margin: 10px;
+    display: none;
+  }
+  #search-button:hover {
+    font-size: 20px;
+  }
+</style>
+
+<!-- HOVER OVER EFFECT
+<div id='content'>
+  <div id='a'>
+      Hover me
+  </div>
+</div>
+<div id='b'>
+ Show me
+</div>
+
+#b {
+  display: none;
+}
+
+#content:hover~#b{
+  display: block;
+} -->
