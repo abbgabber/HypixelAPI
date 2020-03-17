@@ -29,13 +29,13 @@
         <i onclick="getstats(1)" id="search-button" class="fas fa-search"></i>
       </a>
       <div id="profiles"></div>
-      <div style="position:relative; left:700px; top:-100px;">
+      <div style="position:relative; left:700px; top:200px;">
         <p id="rank"></p>
         <select id="profilebutton" onChange="getstats()"></select>
         <div id="playersinprofile"></div>
         <div id="playermodel"></div>
         <div id="armor"></div>
-        <img src="assets/ImperiaL_/revenant_boots.png"
+        <div id="image"></div>
       </div>
       <div id="messages"></div>
     </div>
@@ -159,10 +159,12 @@
     let ProfileName = cuteNames;
     let profilevalue = document.getElementById("profilebutton");
     let armour = document.getElementById("armor");
+    let imagetest = document.getElementById("image");
     // let boots = [];
     // let legg = [];
     // let chest = [];
     // let helm = [];
+    imagetest.innerHTML = "";
     armour.innerHTML = "  ";
     fetch(
       "https://api.slothpixel.me/api/skyblock/profile/" +
@@ -186,15 +188,29 @@
               for (x in armor) {
                 if (armor[x].name !== undefined) {
                   let pprof = document.createElement("p");
-                  pprof.innerHTML = armor[x].name.substring(2);
+                  armors = armor[x].name.substring(2);
+                  pprof.innerHTML = armors;
                   armour.appendChild(pprof);
+
+                  armours = armor[x].attributes.id;
+                  source = "assets/ImperiaL_/" + armours + ".png";
+                  console.log(source);
+                  let image = document.createElement("img");
+                  image.src = source;
+                  imagetest.appendChild(image);
                 }
               }
               if (data.members[i].inventory[0] !== undefined) {
                 weapon = data.members[i].inventory[0].name;
+                weapons = data.members[i].inventory[0].attributes.id;
                 let pprof = document.createElement("p");
                 pprof.innerHTML = weapon.substring(2);
                 armour.appendChild(pprof);
+                source = "assets/ImperiaL_/" + weapons + ".png";
+                console.log(source);
+                let image = document.createElement("img");
+                image.src = source;
+                imagetest.appendChild(image);
               }
             }
           }
@@ -209,17 +225,6 @@
       option.innerHTML = yourprofiles[i];
       // option.innerHTML = "<span style='color: red;'>" + yourprofiles[i] + "</span>";
       profilebutton.appendChild(option);
-    }
-  }
-  function doesFileExist(urlToFile) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("HEAD", urlToFile, false);
-    xhr.send();
-
-    if (xhr.status == "404") {
-      return false;
-    } else {
-      return true;
     }
   }
 </script>
