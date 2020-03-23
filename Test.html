@@ -115,7 +115,6 @@
           if (value == 1) {
             profilebutton.innerHTML = "";
           }
-
           if (data.player.stats.SkyBlock.hasOwnProperty("profiles")) {
             for (i in data.player.stats.SkyBlock.profiles) {
               profileid = data.player.stats.SkyBlock.profiles[i].profile_id;
@@ -133,8 +132,12 @@
             }
           }
         } else {
-          document.getElementById("playermodel").innerHTML = "";
+          // document.getElementById("playermodel").innerHTML = "";
+          console.log("Unable to find Profile");
         }
+      })
+      .catch(error => {
+        console.error("Error:" + error);
       });
   }
 
@@ -186,9 +189,14 @@
                 if (armor[x].name !== undefined) {
                   //Creates Text out of the name of the armor
                   let pprof = document.createElement("p");
-                  armors = armor[x].name.substring(2);
+                  let rarity = armor[x].lore
+                    .slice(-1)[0]
+                    .substring(4)
+                    .split(" ")[0]
+                    .toLowerCase();
+                  console.log(rarity);
+                  pprof.className = "piece" + " " + rarity;
                   pprof.id = armor[x].attributes.id;
-                  pprof.innerHTML = armors;
                   armour.appendChild(pprof);
 
                   // Adds the Icon of the Item inside a square
@@ -199,40 +207,20 @@
                   let image = document.createElement("img");
                   image.id = "armoricon";
                   image.style = "float:left";
-                  image.className = "square";
                   image.src = gearsource;
                   armourimg.appendChild(image);
 
                   // Adds The Lore of the Item
-                  let armortext = document.createElement("p");
-                  let stringed = JSON.stringify(armor[x].lore);
-                  // console.log(stringed);
-                  armortext.innerHTML = armor[x].lore;
-                  armourimg.appendChild(armortext);
-                  // console.log(armor[x].lore);
-
-                  //Version 2.0 That doesn't work but tat I want to get working
-                  // gear = armor[x].attributes.id;
-                  // gearsource = "assets/resources/" + gear + ".png";
-                  // let image = document.createElement("img");
-                  // image.id = armor[x].attributes.id;
-                  // image.className = "square";
-                  // image.src = gearsource;
-                  // armour.appendChild(image);
-
-                  // armourimg = document.getElementById(armor[x].attributes.id);
-                  // let pprof = document.createElement("p");
-                  // armors = armor[x].name.substring(2);
-                  // pprof.id = "armoricon";
-                  // pprof.innerHTML = armors;
-                  // armourimg.appendChild(pprof);
-
-                  // let armortext = document.createElement("p");
-                  // let stringed = JSON.stringify(armor[x].lore);
-                  // // console.log(stringed);
-                  // armortext.innerHTML = stringed;
-                  // armourimg.appendChild(armortext);
-                  // console.log(armor[x].lore);
+                  for (y in armor[x].lore) {
+                    let loretext = document.createElement("p");
+                    loretext.id = "lore";
+                    loretext.innerHTML = armor[x].lore[y];
+                    armourimg.appendChild(loretext);
+                  }
+                  let itemname = document.createElement("p");
+                  itemname.id = "lore";
+                  itemname.innerHTML = armor[x].name.substring(2);
+                  armourimg.appendChild(itemname);
                 }
               }
               // Adds the Item of the first slot to the page
@@ -350,15 +338,13 @@
     margin: -10px -10px -10px -10px;
   }
 
-  #armoricon {
-    font-size: 1000px;
-  }
-  #FISH_HAT {
-    display: block;
-  }
-
   #playersinprofile {
     font-size: 30px;
+  }
+
+  #armoricon {
+    width: 65px;
+    height: 65px;
   }
 
   .wrapper {
@@ -407,17 +393,42 @@
     font-size: 20px;
   }
 
-  .square {
-    height: 50px;
-    width: 50px;
-    background-color: #555;
-  }
-
   p:hover p {
     display: block;
   }
 
   p > p {
     display: none;
+    color: cyan;
+  }
+  .piece {
+    display: inline-block;
+    position: relative;
+    width: 65px;
+    height: 65px;
+    background-color: rgba(0, 0, 0, 0.5);
+    vertical-align: top;
+    margin-right: 8px;
+    margin-top: 12px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    user-select: none;
+    cursor: pointer;
+    transition: z-index 0.2s;
+  }
+  .legendary {
+    background-color: #dd980e;
+  }
+  .epic {
+    background-color: #aa00aa;
+  }
+  .rare {
+    background-color: #5555ff;
+  }
+  .uncommon {
+    background-color: #3cbd3c;
+  }
+  .common {
+    background-color: #555555;
   }
 </style>
